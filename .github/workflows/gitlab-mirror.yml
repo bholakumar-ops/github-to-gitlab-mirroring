@@ -1,0 +1,27 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - '**' # Triggers on all branch pushes
+  create:
+    tags:
+      - '*'  # Triggers when a new tag is created
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches all history for all branches and tags
+
+      - name: Push to GitLab
+        run: |
+          # Replace YOUR_GITLAB_USERNAME and YOUR_REPO_NAME below
+          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/bh-sfdev/github-to-gitlab-mirroring.git
+
+          # Force push all branches and tags to keep GitLab fully synced
+          git push gitlab --all --force
+          git push gitlab --tags --force
